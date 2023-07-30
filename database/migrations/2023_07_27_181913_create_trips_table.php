@@ -1,0 +1,37 @@
+<?php
+
+use App\Models\User;
+use App\Models\Driver;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('trips', function (Blueprint $table) {
+            $table->id();
+            $table->foreignIdFor(User::class);
+            $table->foreignIdFor(Driver::class)->nullable();
+            $table->boolean('trip_started')->default(false);
+            $table->boolean('trip_completed')->default(false);
+            $table->json('pick_up')->nullable();
+            $table->json('destination')->nullable();
+            $table->string('destination_name')->nullable();
+            $table->json('driver_location')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('trips');
+    }
+};
