@@ -1,14 +1,16 @@
 <?php
 
-use App\Http\Controllers\DriverController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\TripController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TripController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\DriverController;
+use App\Http\Controllers\RegisterController;
 
 
 Route::post('login', [LoginController::class, 'login']);
 Route::post('login/verify', [LoginController::class, 'verify']);
+Route::post('signup', [RegisterController::class, 'register']);
 
 Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
    
