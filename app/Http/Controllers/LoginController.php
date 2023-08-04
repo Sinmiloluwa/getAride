@@ -4,38 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\LoginVerifyRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Notifications\LoginNotification;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function login(LoginRequest $request)
+    /**
+     * @param LoginRequest $request
+     * @return JsonResponse
+     */
+    public function login(LoginRequest $request) : JsonResponse
     {
         $validate = $request->validated();
         try {
-            $user = User::firstOrCreate([
-                'phone' => $validate['phone']
-            ]);
-    
-            if (! $user) {
-                return response()->json([
-                    'message' => 'Could not process a user with that phone number.',
-                ], 401);
+            $user = User::where('email', $validate['email'])->first();
+
+            if (! Auth::attempt($request->only(['email', 'password']))) {
+                return $this->badRequestResponse('Email and/or Password does not match.');
             }
-    
+            $data['user'] = $user;
+            $data['token'] = $user->createToken('API TOKEN')->plainTextToken;
             $user->notify(new LoginNotification());
-    
-            return response()->json([
-                'message' => 'Text message sent'
-            ], 200);
+
+            return $this->successResponse('Successful Signin', $data);
         } catch (Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 401);
+            return $this->badRequestResponse($e->getMessage());
         }
-       
+
 
     }
 

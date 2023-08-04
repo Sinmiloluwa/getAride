@@ -12,17 +12,22 @@ class RegisterController extends Controller
 {
     public function register(UserRegisterRequest $request)
     {
-        $user = User::create($request->only(['name', 'password', 'email', 'phone']));
+        try{
+            $user = User::create($request->only(['name', 'password', 'email', 'phone']));
 
-        UserRegistered::dispatch($user);
+            UserRegistered::dispatch($user);
 
-        $token = $user->createToken('auth')->plainTextToken;
+            $token = $user->createToken('auth')->plainTextToken;
 
-        return response()->json([
-            'status' => true,
-            'data' => $user,
-            'token' => $token,
-            'message' => 'User created successfully',
-        ], 201);
+            $data = [
+                'user' => $user,
+                'token' => $token
+            ];
+
+            return $this->successResponse('User created successfully', $data);
+        } catch (\Exception $e){
+            return $this->errorResponse('An error occurred'.$e->getMessage());
+        }
+
     }
 }
