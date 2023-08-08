@@ -17,7 +17,8 @@ class Transaction extends Model
         'transaction_generated_ref',
         'destination',
         'source',
-        'narration'
+        'narration',
+        'trip_id'
     ];
 
     protected $casts = [

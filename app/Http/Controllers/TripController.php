@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TransactionChannel;
+use App\Enums\TransactionStatus;
 use App\Events\TripAccepted;
 use App\Events\TripCompleted;
 use App\Events\TripLocationUpdated;
 use App\Events\TripStarted;
+use App\Models\SavedCard;
+use App\Models\Transaction;
 use App\Models\Trip;
+use App\Services\Paystack\Paystack;
 use Illuminate\Http\Request;
 use App\Http\Requests\Trip\TripRequest;
 
@@ -97,5 +102,36 @@ class TripController extends Controller
         TripCompleted::dispatch($trip, $request->user());
 
         return $trip;
+    }
+
+    public function pay(Request $request, Trip $trip)
+    {
+        $request->validate([
+            'amount' => 'required|numeric',
+            'card_id' => 'required|exists:saved_cards,id',
+            'driver' => 'required|exists:drivers,id',
+        ]);
+
+        $transaction = Transaction::create([
+            'user_id' => $request->user()->id,
+            'status' => TransactionStatus::Pending,
+            'type' => TransactionChannel::Card,
+            'narration' => 'trip',
+            'reference' => uniqid('TRF'),
+            'transaction_generated_ref' => uniqid('MyRide'),
+            'source' => $request->user()->id,
+            'trip_id' => $trip->id,
+            'destination' => $request->driver ?? null
+        ]);
+        $metadata = json_encode(['payment_type' => 'trip', 'trip_id' => $trip->id, 'driver' => $request->driver]);
+
+        $savedCard = SavedCard::where('id', $request->card_id)->first();
+
+        return Paystack::add('email', $request->user()->email)
+            ->add('amount', $request->amount * 100)
+            ->add('reference', $transaction['reference'])
+            ->add('authorization_code', $savedCard->authorization_code)
+            ->add('metadata', $metadata)
+            ->chargeAuthorization();
     }
 }

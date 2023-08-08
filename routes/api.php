@@ -30,8 +30,8 @@ Route::prefix('auth')->middleware('auth:sanctum')->group(function () {
      Route::post('trip/{trip}/end', [TripController::class, 'end']);
      Route::post('trip/{trip}/start', [TripController::class, 'start']);
      Route::post('trip/{trip}/location', [TripController::class, 'location']);
+     Route::post('trip/{trip}/pay', [TripController::class,'pay']);
 
     //payment
     Route::post('initialize', [SaveCardController::class, 'initialize']);
-    Route::post('chargecard', [SaveCardController::class, 'chargeCard']);
 });
