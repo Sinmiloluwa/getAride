@@ -9,19 +9,21 @@ use Illuminate\Http\Request;
 
 class RatingsController extends Controller
 {
-    public function driver(Request $request, Driver $driver, User $user)
+    public function driver(Request $request)
     {
         $request->validate([
             'rating' => 'required|numeric',
         ]);
 
-        Rating::create([
+        $rating = Rating::create([
             'rating' => $request->rating,
             'is_driver' => true
         ]);
+
+        return $this->successResponse('Rating Successful',$rating);
     }
 
-    public function user(Request $request, User $user)
+    public function user(Request $request)
     {
         $request->validate([
             'rating' => 'required|numeric'
@@ -32,10 +34,6 @@ class RatingsController extends Controller
             'is_user' => true
         ]);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'User rated Successfully',
-            'data' => $rating
-        ], 200);
+        return $this->successResponse('Rating Successful',$rating);
     }
 }
