@@ -12,6 +12,7 @@ use App\Models\SavedCard;
 use App\Models\Transaction;
 use App\Models\Trip;
 use App\Services\Paystack\Paystack;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\Trip\TripRequest;
 
@@ -102,6 +103,20 @@ class TripController extends Controller
         TripCompleted::dispatch($trip, $request->user());
 
         return $trip;
+    }
+
+    /**
+     * @param Trip $trip
+     * @return JsonResponse
+     */
+    public function cancel(Trip $trip)
+    {
+        if (!$trip->trip_completed) {
+            $trip->delete();
+            return $this->successResponse('You sucessfully cancelled the trip');
+        } else {
+            return $this->badRequestResponse('You cannot cancel this trip');
+        }
     }
 
     public function pay(Request $request, Trip $trip)
