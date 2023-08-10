@@ -25,11 +25,11 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->renderable(function (ModelNotFoundException $e, $request) {
-            return response()->json(['status' => 'false', 'message' => 'Model not found'], 404);
-        });
-        $this->renderable(function (NotFoundHttpException $e, $request) {
-            return response()->json(['status' => 'false', 'message' => 'Data not found'], 404);
-        });
+//        $this->renderable(function (ModelNotFoundException $e, $request) {
+//            return response()->json(['status' => 'false', 'message' => 'Model not found'], 404);
+//        });
+//        $this->renderable(function (NotFoundHttpException $e, $request) {
+//            return response()->json(['status' => 'false', 'message' => 'Data not found'], 404);
+//        });
     }
 }
